@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     POSTGRE_DB: str = os.environ.get("POSTGRE_DB", "olympic_paris")
 
     @property
-    def DATABASE_URL(self):
-        return f"postgresql://{self.POSTGRE_USER}:{self.POSTGRE_PASSWORD}@{self.POSTGRE_HOST}:{self.POSTGRE_PORT}/{self.POSTGRE_DB}"
+    def DATABASE_URI(self):
+        return f"postgresql+asyncpg://{self.POSTGRE_USER}:{self.POSTGRE_PASSWORD}@{self.POSTGRE_HOST}:{self.POSTGRE_PORT}/{self.POSTGRE_DB}"
 
 
 settings = Settings()

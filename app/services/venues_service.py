@@ -20,6 +20,12 @@ class VenuesService:
             raise HTTPException(status_code=404, detail="Venue not found")
         return result
 
+    async def get_venues_url(self, name: str):
+        result = await venues_crud.get(session=self.session, name=name)
+        if not result:
+            raise HTTPException(status_code=404, detail="Venue not found")
+        return result.url
+
     def get_venues(self):
         pass
 
