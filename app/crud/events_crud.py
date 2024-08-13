@@ -5,3 +5,6 @@ from app.schemas.events_schema import EventsCreate, EventsUpdate
 
 class EventsCRUD(CRUDBase[Events, EventsCreate, EventsUpdate]):
     pass
+
+
+events_crud = EventsCRUD(Events)
