@@ -19,6 +19,8 @@ psycopg2 = "^2.9.9"
 pydantic-settings = "^2.4.0"
 asyncio = "^3.4.3"
 asyncpg = "^0.29.0"
+passlib = "^1.7.4"
+pyjwt = "^2.9.0"
 
 
 [build-system]
