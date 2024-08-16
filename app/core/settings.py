@@ -19,6 +19,13 @@ class Settings(BaseSettings):
     ALGORITHM: str = os.environ.get("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
+    MAIL_USER: str = os.environ.get("MAIL_USER")
+    MAIL_PASSWORD: str = os.environ.get("MAIL_PASSWORD")
+    MAIL_PORT: int = os.environ.get("MAIL_PORT", 587)
+    MAIL_SERVER: str = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+    MAIL_TLS: bool = os.environ.get("MAIL_TLS", True)
+    MAIL_SSL: bool = os.environ.get("MAIL_SSL", False)
+    VALIDATE_CERTS: bool = os.environ.get("VALIDATE_CERTS", True)
     class Config:
         env_file = ".env"
 

@@ -23,6 +23,8 @@ passlib = "^1.7.4"
 pyjwt = "^2.9.0"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.9"
+bcrypt = "^4.2.0"
+fastapi-mail = "^1.4.1"
 
 
 [build-system]

@@ -4,11 +4,8 @@ from app.utils import RoleEnum
 
 
 class UserBase(BaseModel):
-    id: str
     username: str
     email: str
-    is_active: bool
-    role: RoleEnum
 
     class Config:
         orm_mode = True
