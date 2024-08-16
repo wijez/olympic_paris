@@ -33,4 +33,4 @@ class UserUpdate(UserBase):
 
 
 class UserCreate(UserBase):
-    pass
+    password: str

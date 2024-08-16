@@ -21,6 +21,8 @@ asyncio = "^3.4.3"
 asyncpg = "^0.29.0"
 passlib = "^1.7.4"
 pyjwt = "^2.9.0"
+python-jose = "^3.3.0"
+python-multipart = "^0.0.9"
 
 
 [build-system]

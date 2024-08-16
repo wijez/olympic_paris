@@ -9,7 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.engine.reflection import Inspector
 
 # revision identifiers, used by Alembic.
 revision: str = '8b2c971cbaa4'
@@ -19,25 +19,31 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.create_table(
-        'events',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('day', sa.DateTime(), nullable=False),
-        sa.Column('discipline_name', sa.String(), nullable=False),
-        sa.Column('discipline_pictogram', sa.String(), nullable=True),
-        sa.Column('name', sa.String(), nullable=True),
-        sa.Column('venue_name', sa.String(), nullable=False),
-        sa.Column('event_name', sa.String(), nullable=False),
-        sa.Column('detailed_event_name', sa.String(), nullable=True),
-        sa.Column('start_date', sa.DateTime(), nullable=False),
-        sa.Column('end_date', sa.DateTime(), nullable=False),
-        sa.Column('status', sa.String(), nullable=False),
-        sa.Column('is_medal_event', sa.Boolean(), nullable=False),
-        sa.Column('is_live', sa.Boolean(), nullable=False),
-        sa.Column('gender_code', sa.String(), nullable=False),
-        sa.PrimaryKeyConstraint('id')
-    )
+    bind = op.get_bind()
+    inspector = Inspector.from_engine(bind)
+    if 'events' not in inspector.get_table_names():
+        op.create_table(
+            'events',
+            sa.Column('id', sa.Integer(), nullable=False),
+            sa.Column('day', sa.DateTime(), nullable=False),
+            sa.Column('discipline_name', sa.String(), nullable=False),
+            sa.Column('discipline_pictogram', sa.String(), nullable=True),
+            sa.Column('name', sa.String(), nullable=True),
+            sa.Column('venue_name', sa.String(), nullable=False),
+            sa.Column('event_name', sa.String(), nullable=False),
+            sa.Column('detailed_event_name', sa.String(), nullable=True),
+            sa.Column('start_date', sa.DateTime(), nullable=False),
+            sa.Column('end_date', sa.DateTime(), nullable=False),
+            sa.Column('status', sa.String(), nullable=False),
+            sa.Column('is_medal_event', sa.Boolean(), nullable=False),
+            sa.Column('is_live', sa.Boolean(), nullable=False),
+            sa.Column('gender_code', sa.String(), nullable=False),
+            sa.PrimaryKeyConstraint('id')
+        )
 
 
 def downgrade() -> None:
-    op.drop_table('events')
+    bind = op.get_bind()
+    inspector = Inspector.from_engine(bind)
+    if 'events' in inspector.get_table_names():
+        op.drop_table('events')
