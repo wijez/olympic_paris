@@ -1,6 +1,5 @@
 from passlib.context import CryptContext
 
-from app.crud import users_crud
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -14,6 +13,8 @@ def get_password_hash(password):
 
 
 def authenticate_user(username: str, password: str):
+    from app.crud import users_crud
+
     user = users_crud.get(username=username)
     if not user:
         return False

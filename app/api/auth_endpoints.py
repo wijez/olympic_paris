@@ -6,11 +6,14 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.api.Depends.authorization import Token, authenticate_user, create_access_token, get_current_active_user, \
+from app.api.Depends.authorization import authenticate_user, create_access_token, get_current_active_user, \
     get_user
 from app.core import settings, get_async_session
+from app.crud import users_crud
 from app.models.user_model import User
+from app.schemas import Token
 from app.schemas.users_schema import UserCreate
+from app.services.auth_service import AuthService
 from app.utils import generate_verification_code
 from app.utils.security import get_password_hash
 from app.utils.send_verification_email import send_verification_email
@@ -40,8 +43,11 @@ async def verify_user(username: str, code: str, db: AsyncSession = Depends(get_a
 @router.post("/register")
 async def register_user(user: UserCreate, db: AsyncSession = Depends(get_async_session)):
     db_user = await get_user(db, username=user.username)
+    db_email = await users_crud.get(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
+    if db_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
     verify_code = generate_verification_code()
     hashed_password = get_password_hash(user.password)
     new_user = User(
@@ -73,6 +79,37 @@ async def login_for_access_token(db: Annotated[AsyncSession, Depends(get_async_s
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.post("/login")
+async def login_for_tokens(
+        db: AsyncSession = Depends(get_async_session),
+        form_data: OAuth2PasswordRequestForm = Depends()
+) -> Token:
+    # Authenticate the user
+    user = await authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+
+    access_token = AuthService.create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    refresh_token = AuthService.create_refresh_token(
+        data={"sub": user.username}, expires_delta=refresh_token_expires
+    )
+
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer"
+    )
 
 
 @router.get("/me/")

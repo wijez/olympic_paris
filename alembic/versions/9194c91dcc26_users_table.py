@@ -27,7 +27,8 @@ def upgrade() -> None:
         sa.Column('email', sa.String(), nullable=False, index=True),
         sa.Column('hashed_password', sa.String(), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False),
-        sa.Column('role', sa.Enum(RoleEnum), default=RoleEnum.USER ,nullable=False),
+        sa.Column('role', sa.Enum(RoleEnum), default=RoleEnum.USER, nullable=False),
+        sa.Column('verify_code', sa.String(), nullable=True)
     )
 
 

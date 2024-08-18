@@ -1,54 +1,39 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
+from typing import Annotated, Union
 from jose import JWTError, jwt
-import jwt
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
-from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
+from fastapi.security import HTTPBearer, OAuth2PasswordBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 
 from app.models.user_model import User
-from app.utils.role import RoleEnum
 from app.core import settings, get_async_session
+from app.schemas import TokenData
 from app.utils.security import verify_password
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+bearer_scheme = HTTPBearer()
 
-app = FastAPI()
 
-
-async def get_user(db: AsyncSession, username: str) -> User | None:
+async def get_user(db: AsyncSession, username: str) -> Union[User, None]:
     result = await db.execute(select(User).where(User.username == username))
     return result.scalars().first()
 
 
-async def authenticate_user(db: AsyncSession, username: str, password: str) -> User | bool:
+async def authenticate_user(db: AsyncSession, username: str, password: str) -> Union[User, bool]:
     user = await get_user(db, username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
+    if not user or not verify_password(password, user.hashed_password):
         return False
     return user
 
 
 async def get_current_user(
         db: Annotated[AsyncSession, Depends(get_async_session)],
-        token: Annotated[str, Depends(oauth2_scheme)]
+        credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)]
 ) -> User:
+    token = credentials.credentials
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -60,30 +45,26 @@ async def get_current_user(
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except InvalidTokenError:
+    except JWTError:
         raise credentials_exception
 
-    # Ensure get_user is an async function
     user = await get_user(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    expire = datetime.now(timezone.utc) + (expires_delta if expires_delta else timedelta(minutes=15))
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
 async def get_current_active_user(
-        current_user: Annotated[User, Depends(get_current_user)],
+        current_user: Annotated[User, Depends(get_current_user)]
 ):
-    if current_user.disabled:
+    if current_user.is_active is False:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
