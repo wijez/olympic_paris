@@ -1,4 +1,6 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+
 from app.core import Base
 
 
@@ -8,5 +10,6 @@ class Venues(Base):
     name = Column(String, nullable=False, index=True)
     url = Column(String)
 
+    events = relationship("Events", back_populates="venue")
 
 

@@ -9,8 +9,8 @@ class Events(Base):
 
     id = Column(Integer, primary_key=True)
     day = Column(DateTime, nullable=False)
-    discipline_name = Column(String, nullable=False)
-    discipline_pictogram = Column(String, nullable=True)
+    # discipline_name = Column(String, nullable=False)
+    # discipline_pictogram = Column(String, nullable=True)
     name = Column(String, nullable=True)
     venue_name = Column(String, nullable=False)
     event_name = Column(String, nullable=False)
@@ -22,4 +22,9 @@ class Events(Base):
     is_live = Column(Boolean, nullable=False)
     gender_code = Column(String, nullable=False)
 
+    discipline_id = Column(String, ForeignKey("disciplines.id"), nullable=False)
+    venue_id = Column(String, ForeignKey("venues.id"), nullable=False)
+
+    venue = relationship("Venues", back_populates="events")
+    discipline = relationship('Disciplines', back_populates='events')
     competitors = relationship('Competitor', back_populates='event')

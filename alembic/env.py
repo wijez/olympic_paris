@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from app.models import *
+from app.models import Venues, Competitor, Events, Countries, Disciplines
 from app.core import Base, settings
 
 

@@ -9,7 +9,7 @@ class Competitor(Base):
 
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
-    country_id = Column(String, nullable=False)
+    country_id = Column(String, ForeignKey('countries.id'), nullable=False)
     country_flag_url = Column(String, nullable=True)
     competitor_name = Column(String, nullable=False)
     position = Column(Integer, nullable=True)
@@ -18,3 +18,4 @@ class Competitor(Base):
     result_mark = Column(Integer, nullable=False)
 
     event = relationship('Events', back_populates='competitors')
+    country = relationship('Countries', back_populates='competitors')
