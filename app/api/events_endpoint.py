@@ -15,7 +15,7 @@ router = APIRouter(prefix="/events", tags=["events"])
 @router.get("/{id}")
 async def get_event_by_id(id: int, db: AsyncSession = Depends(get_async_session)):
     events_service = EventsService(session=db)
-    data = await events_service.get_events_data(id)
+    data = await events_service.get_events_data(id=id)
     return data
 
 

@@ -3,16 +3,16 @@ from pydantic import BaseModel
 
 class CompetitorsBase(BaseModel):
     id: int
-    name: str
+    event_id: str
     country_id: int
-    country_name: str
-    country_flag_url: str
-    country_continent: str
-    discipline_id: int
-    discipline_name: str
-    discipline_pictogram_url: str
-    discipline_pictogram_url_dark: str
-    venue_id: int
+    competitor_name: str
+    position: str
+    result_position: str
+    result_winnerLoserTie: str
+    result_mark: int
+
+    class Config:
+        from_attributes = True
 
 
 class CompetitorsCreate(CompetitorsBase):

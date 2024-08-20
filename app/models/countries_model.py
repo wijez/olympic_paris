@@ -18,4 +18,4 @@ class Countries(Base):
     rank = Column(Integer, nullable=False)
     rank_total_medals = Column(Integer, nullable=False)
 
-    competitors = relationship('Competitor', back_populates='country')
+    competitors = relationship('Competitor', back_populates='country', lazy="selectin")

@@ -16,5 +16,5 @@ class Competitor(Base):
     result_winnerLoserTie = Column(String, nullable=True)
     result_mark = Column(Integer, nullable=True)
 
-    event = relationship('Events', back_populates='competitors')
-    country = relationship('Countries', back_populates='competitors')
+    event = relationship('Events', back_populates='competitors', lazy="selectin")
+    country = relationship('Countries', back_populates='competitors', lazy="selectin")
