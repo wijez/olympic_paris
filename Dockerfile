@@ -23,5 +23,7 @@ RUN pip install --upgrade pip setuptools wheel && \
 # copy project
 COPY . $APPLICATION_SERVICE
 
+ENTRYPOINT bash ./run.sh
+
 CMD alembic upgrade head && \
     gunicorn app.main:main_app -w 1 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 --timeout 300

@@ -33,6 +33,12 @@ class Settings(BaseSettings):
     VALIDATE_CERTS: bool = os.environ.get("VALIDATE_CERTS", "True").lower() in ("true", "1", "yes")
     TEMPLATE_FOLDER: Path = Path("D:/project/olympic_paris/email_templates").resolve()
 
+    REDIS_HOST: str = os.environ.get("REDIS_HOST", "localhost")
+    REDIS_PORT: int = int(os.environ.get("REDIS_PORT", 6379))
+    REDIS_URL: str = os.environ.get("REDIS_URL", 'redis://localhost:6379/0')
+    CELERY_BROKER_URL: str = os.environ.get("CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND: str = os.environ.get("CELERY_RESULT_BACKEND")
+
     class Config:
         env_file = ".env"
 

@@ -3,13 +3,13 @@ from pydantic import BaseModel
 
 class CompetitorsBase(BaseModel):
     id: int
-    event_id: str
-    country_id: int
+    event_id: int
+    country_id: str
     competitor_name: str
-    position: str
-    result_position: str
-    result_winnerLoserTie: str
-    result_mark: int
+    position: int
+    result_position: str = None
+    result_winnerLoserTie: str = None
+    result_mark: int = None
 
     class Config:
         from_attributes = True
