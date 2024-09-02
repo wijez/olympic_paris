@@ -1,7 +1,26 @@
+from datetime import datetime, timedelta
+
+import jwt
+from jose import JWTError
 from passlib.context import CryptContext
 
+from app.core import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def generate_password_reset_token(email: str):
+    to_encode = {"sub": email, "exp": datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)}
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def verify_password_reset_token(token: str):
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        email = payload.get("sub")
+        return email
+    except JWTError:
+        return None
 
 
 def verify_password(plain_password, hashed_password):

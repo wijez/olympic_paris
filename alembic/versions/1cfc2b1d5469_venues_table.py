@@ -28,6 +28,8 @@ def upgrade() -> None:
             sa.Column('name', sa.String, nullable=False),
             sa.Column('url', sa.String),
         )
+        op.add_column("venues", sa.Column('created_at', sa.DateTime, server_default=sa.func.now()))
+        op.add_column("venues", sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now()))
 
 
 def downgrade():

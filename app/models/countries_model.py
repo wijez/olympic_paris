@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, DateTime, func
 from sqlalchemy.orm import relationship
 
 from app.core import Base
@@ -17,5 +17,7 @@ class Countries(Base):
     total_medals = Column(Integer, nullable=False)
     rank = Column(Integer, nullable=False)
     rank_total_medals = Column(Integer, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     competitors = relationship('Competitor', back_populates='country', lazy="selectin")

@@ -28,9 +28,15 @@ def upgrade() -> None:
         sa.Column('hashed_password', sa.String(), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False),
         sa.Column('role', sa.Enum(RoleEnum), default=RoleEnum.USER, nullable=False),
-        sa.Column('verify_code', sa.String(), nullable=True)
+        sa.Column('verify_code', sa.String(), nullable=True),
+
     )
+    op.execute("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'roleenum') THEN CREATE TYPE roleenum AS ENUM ('SUPERUSER', 'ADMIN', 'USER'); END IF; END $$;")
+
+    op.add_column("users", sa.Column('created_at', sa.DateTime, server_default=sa.func.now()))
+    op.add_column("users", sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now()))
 
 
 def downgrade() -> None:
+    op.execute("DROP TYPE IF EXISTS roleenum;")
     op.drop_table('users')

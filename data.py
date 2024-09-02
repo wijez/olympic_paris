@@ -265,25 +265,25 @@ async def save_disciplines_to_db(disciplines_data):
 
 
 async def main():
-    for _ in range(1, 414):
-        api_result = await urls_to_db(api_url, _)
-        # api_result = await urls_to_db(countries_url, _)
-        print(api_result)
-        response = requests.get(api_result)
-        if response.status_code == 200:
-            events_data = response.json().get("data", [])
-            # await save_countries_to_db(events_data)
-            await save_events_to_db(events_data)
-            print(f"Done {_}")
-        else:
-            print(f"Failed to fetch data from page {_}, status code: {response.status_code}")
+    # for _ in range(1, 414):
+    #     # api_result = await urls_to_db(api_url, _)
+    #     api_result = await urls_to_db(countries_url, _)
+    #     print(api_result)
+    #     response = requests.get(api_result)
+    #     if response.status_code == 200:
+    #         events_data = response.json().get("data", [])
+    #         # await save_countries_to_db(events_data)
+    #         await save_events_to_db(events_data)
+    #         print(f"Done {_}")
+    #     else:
+    #         print(f"Failed to fetch data from page {_}, status code: {response.status_code}")
+    #
+    #     await asyncio.sleep(1)
 
-        await asyncio.sleep(1)
-
-    # # response = requests.get(disciplines_url)
+    response = requests.get(disciplines_url)
     # response = requests.get(venues_url)
-    # events_data = response.json().get("data", [])
-    # # await save_disciplines_to_db(events_data)
+    events_data = response.json().get("data", [])
+    await save_disciplines_to_db(events_data)
     # await save_venues_to_db(events_data)
 
 

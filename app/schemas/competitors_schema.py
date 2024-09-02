@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -16,8 +18,8 @@ class CompetitorsBase(BaseModel):
 
 
 class CompetitorsCreate(CompetitorsBase):
-    pass
+    created_at: datetime
 
 
 class CompetitorsUpdate(CompetitorsBase):
-    pass
+    updated_at: datetime

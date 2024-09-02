@@ -30,8 +30,12 @@ def upgrade():
         sa.Column('total_medals', sa.Integer(), nullable=False),
         sa.Column('rank', sa.Integer(), nullable=False),
         sa.Column('rank_total_medals', sa.Integer(), nullable=False),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
+        sa.Column('created_at', sa.DateTime, server_default=sa.func.now()),
+        sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now())
     )
+    op.add_column("countries", sa.Column('created_at', sa.DateTime, server_default=sa.func.now()))
+    op.add_column("countries", sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now()))
 
 
 def downgrade():

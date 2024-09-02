@@ -1,7 +1,7 @@
 from sqlalchemy.orm import relationship
 
 from app.core import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, func
 
 
 class Events(Base):
@@ -24,6 +24,8 @@ class Events(Base):
 
     discipline_id = Column(String, ForeignKey("disciplines.id"), nullable=False)
     venue_id = Column(String, ForeignKey("venues.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     venue = relationship("Venues", back_populates="events")
     discipline = relationship('Disciplines', back_populates='events')

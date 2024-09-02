@@ -2,7 +2,6 @@ import json
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.redis import redis_client as r
 from app.crud.competitors_crud import competitors_crud
 from app.schemas import CompetitorsBase
 from app.utils import validate_and_update_cache

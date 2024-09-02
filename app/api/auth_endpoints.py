@@ -1,10 +1,13 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter, BackgroundTasks, Form, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_mail import MessageSchema, FastMail
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
+from starlette.templating import Jinja2Templates
 
 from app.api.Depends.authorization import authenticate_user, create_access_token, get_current_active_user, \
     get_user
@@ -12,16 +15,20 @@ from app.core import settings, get_async_session
 from app.crud import users_crud
 from app.models.user_model import User
 from app.schemas import Token
+from app.schemas.auth_schema import PasswordResetRequest
 from app.schemas.users_schema import UserCreate
+from app.services import UsersService
 from app.services.auth_service import AuthService
 from app.utils import generate_verification_code
-from app.utils.security import get_password_hash
-from app.utils.send_verification_email import send_verification_email
+from app.utils.security import get_password_hash, generate_password_reset_token, verify_password_reset_token
+from app.utils.send_verification_email import send_verification_email, send_password_reset_email
 
 router = APIRouter(
     prefix="/users",
     tags=["users"]
 )
+
+templates = Jinja2Templates(directory="templates")
 
 
 @router.post("/verify")
@@ -110,6 +117,48 @@ async def login_for_tokens(
         refresh_token=refresh_token,
         token_type="bearer"
     )
+
+
+@router.post("/password-reset-request/")
+async def password_reset_request(request: PasswordResetRequest,
+                                 db: AsyncSession = Depends(get_async_session),
+                                 ):
+    user_service = UsersService(db)
+    user = await user_service.get_user_by_email(email=request.email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    token = generate_password_reset_token(user.email)
+    await send_password_reset_email(user.email, token)
+
+    return {"msg": "Password reset email has been sent"}
+
+
+@router.get("/reset-password/")
+def render_reset_password_form(request: Request, token: str):
+    email = verify_password_reset_token(token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+    return templates.TemplateResponse("reset_password.html", {"request": request, "token": token})
+
+
+@router.post("/reset-password/")
+async def reset_password(token: str = Form(...), new_password: str = Form(...),
+                         db: AsyncSession = Depends(get_async_session)):
+    users_service = UsersService(session=db)
+    email = verify_password_reset_token(token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+    user = await users_service.get_user_by_email(email=email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.hashed_password = get_password_hash(new_password)
+    await users_service.update_user_password(user=user, new_password=user.hashed_password)
+
+    return {"msg": "Password has been reset successfully"}
 
 
 @router.get("/me/")

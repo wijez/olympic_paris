@@ -37,6 +37,8 @@ def upgrade() -> None:
             sa.PrimaryKeyConstraint('id'),
             sa.ForeignKeyConstraint(['event_id'], ['events.id'], ondelete='CASCADE'),
             sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ondelete='SET NULL'),
+            sa.Column('created_at', sa.DateTime, server_default=sa.func.now()),
+            sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now())
         )
 
 

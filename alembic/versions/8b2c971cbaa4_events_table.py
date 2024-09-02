@@ -39,7 +39,9 @@ def upgrade() -> None:
             sa.Column('gender_code', sa.String(), nullable=True),
             sa.Column('discipline_id', sa.String(), sa.ForeignKey("disciplines.id"), nullable=False),
             sa.Column('venue_id', sa.String(), sa.ForeignKey("venues.id"), nullable=False),
-            sa.PrimaryKeyConstraint('id')
+            sa.PrimaryKeyConstraint('id'),
+            sa.Column('created_at', sa.DateTime, server_default=sa.func.now()),
+            sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now())
         )
 
 

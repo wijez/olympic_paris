@@ -25,6 +25,8 @@ def upgrade() -> None:
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('pictogram_url', sa.String(), nullable=False),
         sa.Column('pictogram_url_dark', sa.String(), nullable=False),
+        sa.Column('created_at', sa.DateTime, server_default=sa.func.now()),
+        sa.Column('updated_at', sa.DateTime, onupdate=sa.func.now())
     )
 
 
